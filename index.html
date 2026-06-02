@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>JobPilot · Tara Banerjee</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" />
+<style>
+  :root{
+    --bg:#EEECE4; --card:#FBFAF5; --ink:#3B3E38; --sub:#86887E; --line:#E3E0D6;
+    --sage:#6F9C86; --sage-deep:#557C68; --sage-soft:#E7EEEA;
+    --clay:#A9805F; --clay-soft:#F1E9E0;
+    --blue:#7C9BB3; --blue-soft:#E8EEF2;
+    --gold:#BF9F5A; --gold-soft:#F3ECDB;
+    --rose:#AE8C8C; --rose-soft:#EFE6E6;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Hanken Grotesk',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  .display{font-family:'Fraunces',Georgia,serif;}
+  .app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+  header{background:linear-gradient(135deg,var(--sage),var(--sage-deep));color:#fff;padding:26px 20px 20px;position:sticky;top:0;z-index:10;}
+  .h-row{display:flex;justify-content:space-between;align-items:flex-end;}
+  .h-title{font-size:26px;line-height:1;}
+  .h-sub{font-size:12px;opacity:.85;margin-top:5px;}
+  .h-stat{font-size:24px;line-height:1;text-align:right;}
+  .h-stat small{display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-top:3px;}
+  main{flex:1;overflow-y:auto;padding:16px 14px 110px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;}
+  .pad{padding:16px;}
+  .row{display:flex;gap:12px;align-items:flex-start;}
+  .icon-badge{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--sage-soft);color:var(--sage-deep);}
+  .muted{color:var(--sub);} .small{font-size:13px;} .xs{font-size:11px;}
+  .title{font-weight:600;line-height:1.3;}
+  .pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:5px;}
+  .meta{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  button{font-family:inherit;cursor:pointer;border:none;}
+  .btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:13px;font-size:13.5px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);}
+  .btn.fill{background:var(--sage);color:#fff;border-color:var(--sage);}
+  .btn.soft{background:var(--sage-soft);color:var(--sage-deep);border-color:transparent;}
+  .btn:disabled{opacity:.65;}
+  .btn.sm{padding:9px 12px;font-size:12.5px;border-radius:11px;}
+  a.btn{text-decoration:none;}
+  input,textarea,select{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px;outline:none;}
+  textarea{resize:none;line-height:1.5;}
+  label.fld{font-size:12px;font-weight:600;color:var(--sub);display:block;margin:14px 0 5px;}
+  .out{background:var(--bg);border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:10px;}
+  .out pre{white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.55;margin:0;color:var(--ink);}
+  .out-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .label-cap{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--sub);}
+  nav{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:9px 0 14px;z-index:20;}
+  nav button{background:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--sub);padding:2px 28px;}
+  nav button.active{color:var(--sage-deep);}
+  nav .lbl{font-size:11px;font-weight:600;}
+  .ic{display:inline-flex;}
+  .ic[data-sz="18"] svg{width:18px;height:18px;} .ic[data-sz="16"] svg{width:16px;height:16px;}
+  .ic[data-sz="14"] svg{width:14px;height:14px;} .ic[data-sz="13"] svg{width:13px;height:13px;}
+  .ic[data-sz="22"] svg{width:22px;height:22px;} .ic[data-sz="12"] svg{width:12px;height:12px;}
+  .ic[data-sz="28"] svg{width:28px;height:28px;}
+  svg.lucide{stroke-width:1.9;}
+  .spin{animation:sp 1s linear infinite;} @keyframes sp{to{transform:rotate(360deg);}}
+  .divider{border-top:1px solid var(--line);}
+  .stat-card{border-radius:16px;border:1px solid var(--line);padding:14px;text-align:center;}
+  .stat-n{font-size:22px;line-height:1;} .bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden;}
+  .empty{text-align:center;margin-top:64px;padding:0 22px;}
+  .syncbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--sage-deep);background:var(--sage-soft);padding:8px 12px;border-radius:999px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+const {
+  useState,
+  useEffect,
+  useRef
+} = React;
+function Ic({
+  n,
+  sz = 16
+}) {
+  return /*#__PURE__*/React.createElement("span", {
+    className: "ic",
+    "data-sz": sz
+  }, /*#__PURE__*/React.createElement("i", {
+    "data-lucide": n
+  }));
+}
+
+// Reads pre-generated jobs (with resume/cover/etc already written by n8n) from your own site's reader.
+const JOBS_URL = "https://api.jsonbin.io/v3/b/6a1c66e821f9ee59d2a1b545/latest?meta=false";
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+function pretty(iso) {
+  if (!iso) return "";
+  return new Date(iso + "T00:00:00").toLocaleDateString("en-IN", {
+    weekday: "short",
+    day: "numeric",
+    month: "short"
+  });
+}
+function keyOf(j) {
+  const u = (j.url || "").split("?")[0];
+  return (u || "") + "|" + (j.title || "").toLowerCase().trim() + "|" + (j.company || "").toLowerCase().trim();
+}
+function downloadTxt(filename, text) {
+  try {
+    const blob = new Blob([String(text || "")], {
+      type: "text/plain;charset=utf-8"
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  } catch (e) {}
+}
+const STATUSES = {
+  saved: {
+    label: "To apply",
+    c: "var(--clay)",
+    bg: "var(--clay-soft)",
+    ic: "clock"
+  },
+  applied: {
+    label: "Applied",
+    c: "var(--sage-deep)",
+    bg: "var(--sage-soft)",
+    ic: "check-circle-2"
+  },
+  interview: {
+    label: "Interview",
+    c: "var(--blue)",
+    bg: "var(--blue-soft)",
+    ic: "calendar-check"
+  },
+  offer: {
+    label: "Offer",
+    c: "var(--gold)",
+    bg: "var(--gold-soft)",
+    ic: "party-popper"
+  },
+  rejected: {
+    label: "Closed",
+    c: "var(--rose)",
+    bg: "var(--rose-soft)",
+    ic: "x-circle"
+  }
+};
+function priorityOf(score) {
+  if (score == null) return "none";
+  const s = Number(score) || 0;
+  return s >= 8 ? "high" : s >= 5 ? "medium" : "low";
+}
+const PRIO = {
+  high: {
+    label: "High match",
+    c: "#3F5E4E",
+    bar: "#6F9C86",
+    bg: "#E7EEEA"
+  },
+  medium: {
+    label: "Medium match",
+    c: "#856321",
+    bar: "#C9A95B",
+    bg: "#F3ECDB"
+  },
+  low: {
+    label: "Lower match",
+    c: "#8A5E49",
+    bar: "#C49079",
+    bg: "#F1E7E0"
+  },
+  none: {
+    label: "",
+    c: "#86887E",
+    bar: "#E3E0D6",
+    bg: "#EEECE4"
+  }
+};
+function load(k, fb) {
+  try {
+    const v = localStorage.getItem(k);
+    return v ? JSON.parse(v) : fb;
+  } catch {
+    return fb;
+  }
+}
+function save(k, v) {
+  try {
+    localStorage.setItem(k, JSON.stringify(v));
+  } catch {}
+}
+
+// AI outputs that n8n pre-generates and stores on each job
+const AI_VIEWS = [{
+  key: "resume",
+  label: "Tailored resume",
+  ic: "sparkles"
+}, {
+  key: "cover",
+  label: "Cover letter",
+  ic: "pen-line"
+}, {
+  key: "fit",
+  label: "Fit analysis",
+  ic: "target"
+}, {
+  key: "interview",
+  label: "Interview prep",
+  ic: "message-circle-question"
+}];
+function App() {
+  const [ready, setReady] = useState(false);
+  const [jobs, setJobs] = useState([]);
+  const [view, setView] = useState("jobs");
+  const [openId, setOpenId] = useState(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState("");
+  const removedRef = useRef([]);
+  const statusRef = useRef({}); // remembers user status/notes per job key
+
+  useEffect(() => {
+    removedRef.current = load("jp_removed", []);
+    statusRef.current = load("jp_status", {});
+    setReady(true);
+    syncFromServer(true);
+    // Auto-refresh: check the mailbox every 5 minutes
+    const timer = setInterval(() => syncFromServer(true), 5 * 60 * 1000);
+    // Also refresh whenever the app is reopened or brought to the foreground
+    const onShow = () => {
+      if (!document.hidden) syncFromServer(true);
+    };
+    document.addEventListener("visibilitychange", onShow);
+    window.addEventListener("focus", onShow);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", onShow);
+      window.removeEventListener("focus", onShow);
+    };
+  }, []);
+  useEffect(() => {
+    if (window.lucide) window.lucide.createIcons();
+  });
+  function persistStatus() {
+    save("jp_status", statusRef.current);
+  }
+  async function syncFromServer(quiet) {
+    setSyncing(true);
+    if (!quiet) setSyncMsg("");
+    try {
+      const res = await fetch(JOBS_URL + "&t=" + Date.now());
+      if (!res.ok) throw new Error("fetch " + res.status);
+      const raw = await res.json();
+      const incoming = Array.isArray(raw) ? raw : raw.jobs || [];
+      const removed = removedRef.current || [];
+      const seen = {};
+      const list = [];
+      incoming.forEach(inc => {
+        const k = keyOf(inc);
+        if (removed.indexOf(k) >= 0) return;
+        if (seen[k]) return;
+        seen[k] = true;
+        const saved = statusRef.current[k] || {};
+        list.push({
+          id: "w" + Math.random().toString(36).slice(2, 9),
+          key: k,
+          title: inc.title || "Untitled",
+          company: inc.company || "",
+          location: inc.location || "",
+          url: inc.url || "",
+          jd: inc.jd || inc.description || "",
+          score: inc.score,
+          reason: inc.reason || "",
+          ai: {
+            resume: inc.resume || "",
+            cover: inc.cover || "",
+            fit: inc.fit || "",
+            interview: inc.interview || ""
+          },
+          hrEmail: inc.hrEmail || "",
+          status: saved.status || "saved",
+          notes: saved.notes || "",
+          dateAdded: inc.dateAdded || todayISO(),
+          dateApplied: saved.dateApplied || null
+        });
+      });
+      list.sort((a, b) => (b.score == null ? -1 : Number(b.score)) - (a.score == null ? -1 : Number(a.score)));
+      setJobs(prev => {
+        if (quiet && prev.length > 0 && list.length > prev.length) {
+          setSyncMsg(list.length - prev.length + " new job" + (list.length - prev.length > 1 ? "s" : ""));
+          setTimeout(() => setSyncMsg(""), 4000);
+        }
+        return list;
+      });
+      if (!quiet) setSyncMsg(list.length + " jobs");
+    } catch (e) {
+      if (!quiet) setSyncMsg("Couldn't reach mailbox");
+    }
+    setSyncing(false);
+    if (!quiet) setTimeout(() => setSyncMsg(""), 2500);
+  }
+  const updateJob = (id, patch) => setJobs(p => p.map(j => {
+    if (j.id !== id) return j;
+    const nj = {
+      ...j,
+      ...patch
+    };
+    statusRef.current[j.key] = {
+      status: nj.status,
+      notes: nj.notes,
+      dateApplied: nj.dateApplied
+    };
+    persistStatus();
+    return nj;
+  }));
+  const removeJob = id => {
+    setJobs(prev => {
+      const j = prev.find(x => x.id === id);
+      if (j) {
+        if (removedRef.current.indexOf(j.key) < 0) {
+          removedRef.current.push(j.key);
+          save("jp_removed", removedRef.current);
+        }
+      }
+      return prev.filter(x => x.id !== id);
+    });
+    setOpenId(null);
+  };
+  const stats = {
+    total: jobs.length,
+    active: jobs.filter(j => ["applied", "interview", "offer"].includes(j.status)).length,
+    todo: jobs.filter(j => j.status === "saved").length
+  };
+  if (!ready) return /*#__PURE__*/React.createElement("div", {
+    className: "app",
+    style: {
+      justifyContent: "center",
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "ic spin",
+    "data-sz": "28"
+  }, /*#__PURE__*/React.createElement("i", {
+    "data-lucide": "loader-2"
+  })));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "app"
+  }, /*#__PURE__*/React.createElement("header", null, /*#__PURE__*/React.createElement("div", {
+    className: "h-row"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "display h-title"
+  }, "JobPilot"), /*#__PURE__*/React.createElement("div", {
+    className: "h-sub"
+  }, "Tara Banerjee \xB7 HR Career Desk")), /*#__PURE__*/React.createElement("div", {
+    className: "h-stat"
+  }, stats.active, /*#__PURE__*/React.createElement("small", null, "in progress")))), /*#__PURE__*/React.createElement("main", null, view === "jobs" && /*#__PURE__*/React.createElement(Jobs, {
+    jobs: jobs,
+    openId: openId,
+    setOpenId: setOpenId,
+    updateJob: updateJob,
+    removeJob: removeJob,
+    onSync: () => syncFromServer(false),
+    syncing: syncing,
+    syncMsg: syncMsg
+  }), view === "tracker" && /*#__PURE__*/React.createElement(Tracker, {
+    jobs: jobs,
+    stats: stats
+  })), /*#__PURE__*/React.createElement("nav", null, [["jobs", "Jobs", "briefcase"], ["tracker", "Tracker", "bar-chart-3"]].map(([k, l, ic]) => /*#__PURE__*/React.createElement("button", {
+    key: k,
+    className: view === k ? "active" : "",
+    onClick: () => {
+      setView(k);
+      setOpenId(null);
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: ic,
+    sz: 22
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, l)))));
+}
+function Pill({
+  status
+}) {
+  const s = STATUSES[status] || STATUSES.saved;
+  return /*#__PURE__*/React.createElement("span", {
+    className: "pill",
+    style: {
+      background: s.bg,
+      color: s.c
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: s.ic,
+    sz: 12
+  }), s.label);
+}
+function Jobs({
+  jobs,
+  openId,
+  setOpenId,
+  updateJob,
+  removeJob,
+  onSync,
+  syncing,
+  syncMsg
+}) {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "syncbar"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "chip",
+    onClick: onSync,
+    disabled: syncing
+  }, syncing ? /*#__PURE__*/React.createElement("span", {
+    className: "ic spin",
+    "data-sz": "14"
+  }, /*#__PURE__*/React.createElement("i", {
+    "data-lucide": "loader-2"
+  })) : /*#__PURE__*/React.createElement(Ic, {
+    n: "refresh-cw",
+    sz: 14
+  }), syncing ? "Syncing…" : "Refresh jobs"), syncMsg ? /*#__PURE__*/React.createElement("span", {
+    className: "xs muted"
+  }, syncMsg) : /*#__PURE__*/React.createElement("span", {
+    className: "xs muted"
+  }, jobs.length, " job", jobs.length !== 1 ? "s" : "")), jobs.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "empty"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "icon-badge",
+    style: {
+      margin: "0 auto 14px",
+      width: 60,
+      height: 60,
+      borderRadius: 18
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "briefcase",
+    sz: 28
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "display",
+    style: {
+      fontSize: 21,
+      marginBottom: 8
+    }
+  }, "No jobs yet"), /*#__PURE__*/React.createElement("p", {
+    className: "small muted"
+  }, "Your workflow adds scored jobs here twice a day. Tap Refresh to check now.")) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 12
+    }
+  }, jobs.map(j => /*#__PURE__*/React.createElement(JobCard, {
+    key: j.id,
+    job: j,
+    open: openId === j.id,
+    onToggle: () => setOpenId(openId === j.id ? null : j.id),
+    updateJob: updateJob,
+    removeJob: removeJob
+  }))));
+}
+function JobCard({
+  job,
+  open,
+  onToggle,
+  updateJob,
+  removeJob
+}) {
+  const [edit, setEdit] = useState(false);
+  const [copied, setCopied] = useState(null);
+  const [tab, setTab] = useState(null);
+  const ai = job.ai || {};
+  const applyUrl = job.url && job.url.startsWith("http") ? job.url : "https://www.linkedin.com/jobs/search/?keywords=" + encodeURIComponent(job.title + " " + job.company);
+  const mailtoHR = () => {
+    const s = encodeURIComponent("Application: " + job.title + " — Tara Banerjee");
+    const b = encodeURIComponent((ai.cover || "Dear Hiring Team,\n\n") + "\n\n— Tara Banerjee | 9830115294");
+    return "mailto:" + (job.hrEmail || "") + "?subject=" + s + "&body=" + b;
+  };
+  const doCopy = async (t, id) => {
+    try {
+      await navigator.clipboard.writeText(t);
+      setCopied(id);
+      setTimeout(() => setCopied(null), 1300);
+    } catch {}
+  };
+  const hasAny = ai.resume || ai.cover || ai.fit || ai.interview;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      borderLeft: "5px solid " + PRIO[priorityOf(job.score)].bar
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: onToggle,
+    style: {
+      background: "none",
+      width: "100%",
+      textAlign: "left",
+      padding: 16
+    },
+    className: "row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "icon-badge"
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "building-2",
+    sz: 18
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "title"
+  }, job.title), /*#__PURE__*/React.createElement("div", {
+    className: "small muted"
+  }, job.company), /*#__PURE__*/React.createElement("div", {
+    className: "meta",
+    style: {
+      marginTop: 4
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "map-pin",
+    sz: 12
+  }), job.location || "—"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 9,
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement(Pill, {
+    status: job.status
+  }), job.score != null && /*#__PURE__*/React.createElement("span", {
+    className: "pill",
+    style: {
+      background: PRIO[priorityOf(job.score)].bg,
+      color: PRIO[priorityOf(job.score)].c
+    }
+  }, job.score, "/10 \xB7 ", PRIO[priorityOf(job.score)].label), /*#__PURE__*/React.createElement("span", {
+    className: "xs muted"
+  }, pretty(job.dateAdded)))), /*#__PURE__*/React.createElement(Ic, {
+    n: open ? "chevron-up" : "chevron-down",
+    sz: 18
+  })), open && /*#__PURE__*/React.createElement("div", {
+    className: "pad divider",
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 12
+    }
+  }, job.reason && /*#__PURE__*/React.createElement("div", {
+    className: "small muted",
+    style: {
+      fontStyle: "italic"
+    }
+  }, "\"", job.reason, "\""), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "label-cap",
+    style: {
+      marginBottom: 6
+    }
+  }, "Status"), /*#__PURE__*/React.createElement("select", {
+    value: job.status,
+    onChange: e => updateJob(job.id, {
+      status: e.target.value,
+      dateApplied: e.target.value !== "saved" && !job.dateApplied ? todayISO() : e.target.value === "saved" ? null : job.dateApplied
+    })
+  }, Object.entries(STATUSES).map(([k, v]) => /*#__PURE__*/React.createElement("option", {
+    key: k,
+    value: k
+  }, v.label)))), /*#__PURE__*/React.createElement("div", {
+    className: "grid2"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "btn",
+    href: applyUrl,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "external-link",
+    sz: 16
+  }), "Apply on LinkedIn"), /*#__PURE__*/React.createElement("a", {
+    className: "btn",
+    href: mailtoHR()
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "mail",
+    sz: 16
+  }), "Email HR")), hasAny ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "label-cap",
+    style: {
+      marginBottom: 6
+    }
+  }, "Ready-made documents"), /*#__PURE__*/React.createElement("div", {
+    className: "grid2"
+  }, AI_VIEWS.filter(v => ai[v.key]).map(v => /*#__PURE__*/React.createElement("button", {
+    key: v.key,
+    className: "btn" + (tab === v.key ? " fill" : " soft"),
+    onClick: () => setTab(tab === v.key ? null : v.key)
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: v.ic,
+    sz: 16
+  }), v.label)))) : /*#__PURE__*/React.createElement("div", {
+    className: "small muted"
+  }, "Documents are written automatically when the workflow runs. Tap Refresh after the next run."), tab && ai[tab] && /*#__PURE__*/React.createElement("div", {
+    className: "out"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "out-head"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "label-cap"
+  }, (AI_VIEWS.find(v => v.key === tab) || {}).label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn sm",
+    onClick: () => doCopy(ai[tab], tab)
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: copied === tab ? "check" : "copy",
+    sz: 13
+  }), copied === tab ? "Copied" : "Copy"), /*#__PURE__*/React.createElement("button", {
+    className: "btn sm",
+    onClick: () => downloadTxt("Tara Banerjee - " + (AI_VIEWS.find(v => v.key === tab) || {}).label + " - " + (job.company || "job") + ".txt", ai[tab])
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "download",
+    sz: 13
+  }), "Download"))), /*#__PURE__*/React.createElement("pre", null, ai[tab])), /*#__PURE__*/React.createElement("button", {
+    className: "xs",
+    style: {
+      background: "none",
+      color: "var(--sage-deep)",
+      fontWeight: 700,
+      padding: 0
+    },
+    onClick: () => setTab(tab === "jd" ? null : "jd")
+  }, tab === "jd" ? "Hide" : "Show", " job description"), tab === "jd" && /*#__PURE__*/React.createElement("p", {
+    className: "small muted",
+    style: {
+      lineHeight: 1.55
+    }
+  }, job.jd || "Not available"), /*#__PURE__*/React.createElement("button", {
+    className: "xs",
+    style: {
+      background: "none",
+      color: "var(--sub)",
+      fontWeight: 700,
+      padding: 0,
+      textAlign: "left"
+    },
+    onClick: () => setEdit(e => !e)
+  }, edit ? "Hide notes" : "My notes"), edit && /*#__PURE__*/React.createElement("textarea", {
+    rows: 3,
+    value: job.notes || "",
+    onChange: e => updateJob(job.id, {
+      notes: e.target.value
+    }),
+    placeholder: "Recruiter name, referral, reminders\u2026"
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "xs",
+    style: {
+      background: "none",
+      color: "#A1493B",
+      fontWeight: 600,
+      padding: 0,
+      display: "flex",
+      alignItems: "center",
+      gap: 6
+    },
+    onClick: () => removeJob(job.id)
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "trash-2",
+    sz: 13
+  }), "Remove job")));
+}
+function Tracker({
+  jobs,
+  stats
+}) {
+  const tracked = jobs.filter(j => j.dateApplied);
+  const byDay = {};
+  tracked.forEach(j => {
+    (byDay[j.dateApplied] = byDay[j.dateApplied] || []).push(j);
+  });
+  const days = Object.keys(byDay).sort((a, b) => a < b ? 1 : -1);
+  const max = Math.max(1, ...days.map(d => byDay[d].length));
+  const todo = jobs.filter(j => j.status === "saved");
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "display",
+    style: {
+      fontSize: 21
+    }
+  }, "Tracker"), /*#__PURE__*/React.createElement("div", {
+    className: "grid3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-card",
+    style: {
+      background: "var(--card)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-n display"
+  }, stats.total), /*#__PURE__*/React.createElement("div", {
+    className: "xs muted",
+    style: {
+      marginTop: 4
+    }
+  }, "Total")), /*#__PURE__*/React.createElement("div", {
+    className: "stat-card",
+    style: {
+      background: "var(--sage-soft)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-n display",
+    style: {
+      color: "var(--sage-deep)"
+    }
+  }, stats.active), /*#__PURE__*/React.createElement("div", {
+    className: "xs muted",
+    style: {
+      marginTop: 4
+    }
+  }, "In progress")), /*#__PURE__*/React.createElement("div", {
+    className: "stat-card",
+    style: {
+      background: "var(--clay-soft)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-n display",
+    style: {
+      color: "var(--clay)"
+    }
+  }, stats.todo), /*#__PURE__*/React.createElement("div", {
+    className: "xs muted",
+    style: {
+      marginTop: 4
+    }
+  }, "To apply"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "label-cap",
+    style: {
+      marginBottom: 8
+    }
+  }, "Activity by day"), days.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "card pad small muted",
+    style: {
+      textAlign: "center"
+    }
+  }, "Move a job to ", /*#__PURE__*/React.createElement("b", null, "Applied"), " and it appears here, grouped by day.") : /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 12
+    }
+  }, days.map(d => /*#__PURE__*/React.createElement("div", {
+    className: "card pad",
+    key: d
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "title",
+    style: {
+      fontSize: 14
+    }
+  }, pretty(d)), /*#__PURE__*/React.createElement("span", {
+    className: "pill",
+    style: {
+      background: "var(--sage-soft)",
+      color: "var(--sage-deep)"
+    }
+  }, byDay[d].length, " active")), /*#__PURE__*/React.createElement("div", {
+    className: "bar",
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: "100%",
+      borderRadius: 999,
+      background: "var(--sage)",
+      width: byDay[d].length / max * 100 + "%"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 6
+    }
+  }, byDay[d].map(j => {
+    const s = STATUSES[j.status] || STATUSES.saved;
+    return /*#__PURE__*/React.createElement("div", {
+      key: j.id,
+      className: "small",
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 8
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: s.c
+      }
+    }, /*#__PURE__*/React.createElement(Ic, {
+      n: s.ic,
+      sz: 14
+    })), /*#__PURE__*/React.createElement("span", {
+      style: {
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap"
+      }
+    }, j.title, " \xB7 ", /*#__PURE__*/React.createElement("span", {
+      className: "muted"
+    }, j.company)));
+  })))))), todo.length > 0 && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "label-cap",
+    style: {
+      marginBottom: 8
+    }
+  }, "Still to apply (", todo.length, ")"), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 8
+    }
+  }, todo.map(j => /*#__PURE__*/React.createElement("div", {
+    key: j.id,
+    className: "small",
+    style: {
+      padding: "8px",
+      display: "flex",
+      alignItems: "center",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "var(--clay)"
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "clock",
+    sz: 14
+  })), /*#__PURE__*/React.createElement("span", {
+    style: {
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    }
+  }, j.title, " \xB7 ", /*#__PURE__*/React.createElement("span", {
+    className: "muted"
+  }, j.company)))))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));</script>
+</body>
+</html>
