@@ -32,6 +32,15 @@
     box-shadow:0 6px 16px rgba(0,0,0,.2); display:flex; align-items:center; justify-content:center;}
   .refresh.spin svg{animation:spin .8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
+
+  .runnow{position:fixed; bottom:calc(env(safe-area-inset-bottom,0px) + 18px); right:82px;
+    height:52px; padding:0 18px; border-radius:26px; background:#1F8A4C; color:#fff; border:none;
+    box-shadow:0 6px 16px rgba(0,0,0,.2); display:flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:700; font-family:-apple-system,sans-serif;}
+  .runnow.busy{opacity:.7;}
+  .runnow .dot{width:8px; height:8px; border-radius:50%; background:#fff;}
+  .runnow.busy .dot{animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 </style>
 </head>
 <body>
@@ -41,6 +50,9 @@
   <div id="list"><div class="status">Loading jobs…</div></div>
 </div>
 
+<button class="runnow" id="runNowBtn" aria-label="Run search now">
+  <span class="dot"></span><span id="runNowLabel">Run now</span>
+</button>
 <button class="refresh" id="refreshBtn" aria-label="Refresh">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
 </button>
@@ -49,6 +61,8 @@
 // ---- CONFIG: fill these in ----
 const JSONBIN_ID = "6a1c66e821f9ee59d2a1b545";
 const JSONBIN_READ_KEY = "$2a$10$mbKaxeveb6/T5OcPA39cn.Ypvm2qp9EvWHcrDMzwDQeufICOmVJl."; // read-only, Bins-scoped
+const TRIGGER_URL = "https://script.google.com/macros/s/AKfycbxTlBEtgV8UrMCJvx6uVkKTcJegJ5tqVjnhc3JVHBP5fjyH_G4LkeIq9shiX8qh0rgqzA/exec";   // from Apps Script > Deploy > Web app
+const TRIGGER_KEY = "Ban0203#"; // must match TRIGGER_KEY in setupKeys()
 
 async function loadJobs(){
   spin(true);
@@ -107,7 +121,32 @@ function escapeHtml(s){
 
 function spin(on){ document.getElementById("refreshBtn").classList.toggle("spin", on); }
 
+async function runNow(){
+  if(TRIGGER_URL.indexOf("PASTE") !== -1){
+    alert("Set up the Web App URL and trigger key first — see setup steps.");
+    return;
+  }
+  const btn = document.getElementById("runNowBtn");
+  const label = document.getElementById("runNowLabel");
+  btn.classList.add("busy");
+  label.textContent = "Searching…";
+  try{
+    // Apps Script web apps don't send CORS headers for GET, so we fire in
+    // no-cors mode. The fetch still waits for the script to finish running
+    // (Apps Script holds the connection open until doGet returns) even
+    // though we can't read the response body.
+    await fetch(`${TRIGGER_URL}?key=${encodeURIComponent(TRIGGER_KEY)}`, { mode: "no-cors" });
+  }catch(e){
+    // no-cors fetches can still reject on network-level failures
+  }
+  label.textContent = "Fetching results…";
+  await loadJobs();
+  btn.classList.remove("busy");
+  label.textContent = "Run now";
+}
+
 document.getElementById("refreshBtn").addEventListener("click", loadJobs);
+document.getElementById("runNowBtn").addEventListener("click", runNow);
 loadJobs();
 </script>
 </body>
